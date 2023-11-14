@@ -44,6 +44,7 @@ class Services {
       "profilepic": FirebaseAuth.instance.currentUser!.photoURL,
       "phone": FirebaseAuth.instance.currentUser!.phoneNumber,
       "favourites": [],
+      "services":[]
     };
     FirebaseFirestore.instance
         .collection("Users")

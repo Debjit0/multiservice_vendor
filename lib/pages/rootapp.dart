@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:multiservice_vendor/Widgets/bottombar_item.dart';
+import 'package:multiservice_vendor/pages/add_service.dart';
 import 'package:multiservice_vendor/pages/dashboard.dart';
 import 'package:multiservice_vendor/theme/color.dart';
 
@@ -27,9 +28,9 @@ class _RootAppState extends State<RootApp> {
       "page": Dashboard(),
     },
     {
-      "icon": Icons.groups,
-      "active_icon": Icons.groups,
-      "page": Dashboard(),
+      "icon": Icons.add,
+      "active_icon": Icons.add,
+      "page": AddService(),
     },
     {
       "icon": Icons.forum_outlined,

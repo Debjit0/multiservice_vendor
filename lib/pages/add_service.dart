@@ -1,23 +1,42 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 import 'package:multiservice_vendor/Widgets/custom_image_profile.dart';
-import 'package:multiservice_vendor/Widgets/recommend_item.dart';
+import 'package:multiservice_vendor/Widgets/service_card.dart';
 import 'package:multiservice_vendor/pages/authGoogle.dart';
 import 'package:multiservice_vendor/theme/color.dart';
 import 'package:multiservice_vendor/utils/data.dart';
 
-
-class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+class AddService extends StatefulWidget {
+  const AddService({super.key});
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<AddService> createState() => _AddServiceState();
 }
 
-class _DashboardState extends State<Dashboard> {
-  var profile = "https://avatars.githubusercontent.com/u/86506519?v=4";
+class _AddServiceState extends State<AddService> {
+  var allResults = [];
+  var isLoading = true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    getAllServices().whenComplete(() => setState(
+          () {
+            isLoading = false;
+          },
+        ));
+    super.initState();
+  }
+
+  Future getAllServices() async {
+    var propDocuments =
+        await FirebaseFirestore.instance.collection("Services").get();
+    print("Services Length ${propDocuments.docs.length}");
+    allResults = (List.from(propDocuments.docs));
+    print(allResults[0]["Name"]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -29,7 +48,8 @@ class _DashboardState extends State<Dashboard> {
           floating: true,
           title: _buildHeader(),
         ),
-        SliverToBoxAdapter(child: _buildBody())
+        SliverToBoxAdapter(
+            child: isLoading == true ? _buildBodyLoading() : _buildBody())
       ],
     );
   }
@@ -92,26 +112,29 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  _buildBody() {
-    return Column(
+  _buildBodyLoading() {
+    return Center(
+      child: CircularProgressIndicator(),
     );
   }
 
-
-
-
-  Widget _buildServices() {
-    List<Widget> lists = List.generate(recommended.length, (index) {
-      //print(allResults[index].id);
-      return RecommendItem(
-        data: recommended[index],
-      );
-    });
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.only(bottom: 5, left: 15),
-      child: Row(children: lists),
+  _buildBody() {
+    return Column(
+      children: [
+        Text("Select Services to provide"),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: allResults.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
+              child: ServiceCard(
+                  name: allResults[index]["Name"],
+                  rate: allResults[index]["Hourly Rates"]),
+            );
+          },
+        ),
+      ],
     );
   }
 }
